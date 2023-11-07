@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const stripe = require("stripe")('sk_test_51M97QKAix5nU0JTZs2TDDaBqMo1wGKzD8iuzOFMPgaQ4zdSYprKVRF9BsrYxiG8miYDeJyLeZ54Cp2atlYviSzAq00xiZCOVMy')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 
@@ -25,6 +26,27 @@ async function run() {
     try {
         const courses = client.db('alemeno').collection('courses')
 
+
+        // Payment Method
+        app.post('/create-payment-intent', async (req, res) => {
+            const { itemPrice } = req.body;
+            const amount = itemPrice * 100;
+
+            const paymentIntent = await stripe.paymentIntents.create({
+                currency: 'usd',
+                amount: amount,
+                "payment_method_types": [
+                    "card"
+                ]
+            });
+            res.send({
+                clientSecret: paymentIntent.client_secret,
+            });
+        });
+
+
+
+
         // Find All courses
         app.get('/all-courses', async (req, res) => {
             const allCourses = await courses.find().toArray();
@@ -37,6 +59,18 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const findCourse = await courses.findOne(query);
             res.send(findCourse)
+        });
+
+
+        // Enrolled Students
+        app.put('/enrolled', async (req, res) => {
+            {
+                const { id, allPaymentandUserInfo } = req.body;
+                const query = { _id: new ObjectId(id) };
+
+                const result = await courses.updateOne(query, { $push: { 'students': allPaymentandUserInfo } });
+                res.send(result)
+            }
         })
 
     } finally {

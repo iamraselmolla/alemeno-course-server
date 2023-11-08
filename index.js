@@ -61,13 +61,13 @@ async function run() {
             res.send(findCourse)
         });
 
-        
+
 
 
         // Enrolled Students
         app.put('/enrolled', async (req, res) => {
             {
-                const { id, allPaymentandUserInfo,progress } = req.body;
+                const { id, allPaymentandUserInfo, progress } = req.body;
                 allPaymentandUserInfo.progress
                 const query = { _id: new ObjectId(id) };
 
@@ -79,14 +79,12 @@ async function run() {
 
         // mark course completed
         app.put('/mark-completed', async (req, res) => {
-            const {id, email} = req.body;
-           const result = await courses.findOneAndUpdate({"_id" : new ObjectId(id), 'students.studentsInfo.email': email}, {$set:{
-                'progress' : 100
-           }});
+            const { id, email } = req.body;
+            const result = await courses.findOneAndUpdate({ "_id": new ObjectId(id), 'students.studentsInfo.email': email }, { $set: { "students.$.progress": 100 } });
 
-           console.log(result)
+            res.status(201).json({ message: 'Course marked as complete' })
 
-            
+
         })
 
     } finally {

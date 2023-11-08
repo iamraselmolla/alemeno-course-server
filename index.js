@@ -65,7 +65,8 @@ async function run() {
         // Enrolled Students
         app.put('/enrolled', async (req, res) => {
             {
-                const { id, allPaymentandUserInfo } = req.body;
+                const { id, allPaymentandUserInfo,progress } = req.body;
+                allPaymentandUserInfo.progress
                 const query = { _id: new ObjectId(id) };
 
                 const result = await courses.updateOne(query, { $push: { 'students': allPaymentandUserInfo } });

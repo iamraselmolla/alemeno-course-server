@@ -61,6 +61,8 @@ async function run() {
             res.send(findCourse)
         });
 
+        
+
 
         // Enrolled Students
         app.put('/enrolled', async (req, res) => {
@@ -72,6 +74,19 @@ async function run() {
                 const result = await courses.updateOne(query, { $push: { 'students': allPaymentandUserInfo } });
                 res.send(result)
             }
+        });
+
+
+        // mark course completed
+        app.put('/mark-completed', async (req, res) => {
+            const {id, email} = req.body;
+           const result = await courses.findOneAndUpdate({"_id" : new ObjectId(id), 'students.studentsInfo.email': email}, {$set:{
+                'progress' : 100
+           }});
+
+           console.log(result)
+
+            
         })
 
     } finally {

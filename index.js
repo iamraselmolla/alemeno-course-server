@@ -49,9 +49,20 @@ async function run() {
 
         // Find All courses
         app.get('/all-courses', async (req, res) => {
-            const allCourses = await courses.find().toArray();
-            res.send(allCourses)
+            const size = parseInt(req.query.size);
+
+            let query = courses.find();
+
+            if (!isNaN(size) && size > 0) {
+                query = query.limit(size);
+            }
+
+            const allCourses = await query.toArray();
+            const documentCount = await courses.estimatedDocumentCount()
+
+            res.send({ allCourses, documentCount });
         });
+
 
         // Find single Course
         app.get('/courses/:id', async (req, res) => {

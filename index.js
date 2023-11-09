@@ -49,15 +49,15 @@ async function run() {
 
         // Find All courses
         app.get('/all-courses', async (req, res) => {
-            const size = parseInt(req.query.size);
+            const { size, page } = req.query;
 
             let query = courses.find();
 
             if (!isNaN(size) && size > 0) {
-                query = query.limit(size);
+                query = query.limit(parseInt(size));
             }
 
-            const allCourses = await query.toArray();
+            const allCourses = await query.skip(parseInt(size) * parseInt(page)).toArray();
             const documentCount = await courses.estimatedDocumentCount()
 
             res.send({ allCourses, documentCount });

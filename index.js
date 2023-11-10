@@ -73,7 +73,15 @@ async function run() {
         });
 
 
-
+        // Get Students Courses
+        app.get('/get-student-course', async (req, res) => {
+            const { email } = req.query;
+            if (!email) {
+                return res.status(404).json({ message: 'No email found' })
+            }
+            const findAllCourses = await courses.find({ 'students.studentsInfo.email': email }).toArray();
+            res.send(findAllCourses)
+        })
 
         // Enrolled Students
         app.put('/enrolled', async (req, res) => {
